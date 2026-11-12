@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ClassSense AI | Classroom Intelligence</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<aside class="sidebar">
+ <a class="brand" href="#"><span class="brand-mark">CS</span><span>ClassSense <small>AI CLASSROOM</small></span></a>
+ <div class="nav-label">WORKSPACE</div>
+ <button class="nav active" data-view="overview">▦ <span>Overview</span></button>
+ <button class="nav" data-view="sessions">◷ <span>Sessions</span></button>
+ <button class="nav" data-view="students">♙ <span>Students</span></button>
+ <div class="side-note"><b>Privacy-first workspace</b><p>Use authorized classroom data only. Human review is required for all insights.</p></div>
+ <div class="side-foot">MULTIMODAL ATTENDANCE<br>&amp; ENGAGEMENT AGENT</div>
+</aside>
+<main class="main">
+ <header class="topbar"><div><span class="eyebrow">CLASSROOM INTELLIGENCE</span><h1 id="page-title">Overview</h1></div><div class="top-right"><span class="status-dot"></span> Local workspace <span class="avatar">CS</span></div></header>
+ <div id="alert" class="alert hidden"></div>
+ <section id="overview-view" class="view">
+  <div class="welcome"><div><span class="eyebrow">YOUR CLASSROOM, AT A GLANCE</span><h2>Make every session more informed.</h2><p>Track attendance, review session signals and support educator decisions.</p></div><button class="btn btn-primary" id="new-session-open">＋ New session</button></div>
+  <div class="stats">
+   <article class="stat"><span>ACTIVE STUDENTS</span><b id="stat-students">—</b><small>In the current roster</small></article>
+   <article class="stat"><span>ACTIVE SESSIONS</span><b id="stat-active">—</b><small>Currently in progress</small></article>
+   <article class="stat"><span>TOTAL SESSIONS</span><b id="stat-total">—</b><small>Recorded in this workspace</small></article>
+  </div>
+  <div class="panel"><div class="panel-head"><div><h3>Recent sessions</h3><p>Your latest classroom activity</p></div><button class="btn btn-quiet" data-go="sessions">View all →</button></div><div class="table-wrap"><table><thead><tr><th>SESSION</th><th>CLASS</th><th>DATE</th><th>ATTENDANCE</th><th>STATUS</th><th></th></tr></thead><tbody id="recent-table"></tbody></table></div></div>
+  <div class="info-banner"><span>ⓘ</span><div><b>Interpret insights responsibly</b><p>Head pose, movement and audio activity are indirect signals. They do not prove attention, effort, learning or understanding.</p></div></div>
+ </section>
+
+ <section id="sessions-view" class="view hidden">
+  <div class="section-toolbar"><div><h2>Session management</h2><p>Create sessions, record attendance and review engagement indicators.</p></div><button class="btn btn-primary" id="new-session-open-2">＋ Create session</button></div>
+  <div id="sessions-list" class="session-list"></div>
+ </section>
+
+ <section id="students-view" class="view hidden">
+  <div class="section-toolbar"><div><h2>Student roster</h2><p>Manage the class list used for attendance records.</p></div><button class="btn btn-primary" id="add-student-open">＋ Add student</button></div>
+  <div class="panel"><div class="table-wrap"><table><thead><tr><th>STUDENT</th><th>STUDENT ID</th><th>CLASS / GROUP</th><th>STATUS</th></tr></thead><tbody id="students-table"></tbody></table></div></div>
+ </section>
+
+ <section id="session-detail-view" class="view hidden">
+  <button class="back-link" id="back-sessions">← Back to sessions</button>
+  <div class="detail-head"><div><span class="eyebrow">SESSION WORKSPACE</span><h2 id="detail-title">Session</h2><p id="detail-subtitle"></p></div><button class="btn btn-danger" id="end-session">Complete session</button></div>
+  <div class="detail-grid">
+   <div class="panel"><div class="panel-head"><div><h3>Mark attendance</h3><p>Manual confirmation by an authorized educator</p></div></div>
+    <div class="inline-form"><select id="attendance-student"></select><button class="btn btn-primary" id="mark-attendance">Mark present</button></div>
+    <div class="table-wrap"><table><thead><tr><th>STUDENT</th><th>STATUS</th><th>TIME</th></tr></thead><tbody id="attendance-table"></tbody></table></div>
+   </div>
+   <div class="panel"><div class="panel-head"><div><h3>Engagement indicators</h3><p>Add an observed session-level signal (0–100)</p></div></div>
+    <div class="form-grid"><label>Minute<input id="signal-minute" type="number" min="0" value="0"></label><label>Indicator score<input id="signal-value" type="number" min="0" max="100" value="60"></label><label class="full">Signal type<select id="signal-type"><option value="engagement_proxy">Engagement proxy</option><option value="interaction">Interaction activity</option><option value="inactivity">Inactivity indicator</option><option value="audio_activity">Audio activity</option></select></label></div>
+    <button class="btn btn-primary full-btn" id="add-signal">Save indicator</button>
+   </div>
+  </div>
+  <div class="detail-grid lower">
+   <div class="panel"><div class="panel-head"><div><h3>Session trend</h3><p>Entered indicators grouped by minute</p></div></div><canvas id="trend-chart" height="180"></canvas><p id="no-chart" class="empty">Add session indicators to see a trend.</p></div>
+   <div class="panel"><div class="panel-head"><div><h3>AI-assisted teaching prompts</h3><p>Rule-based suggestions from available indicators</p></div></div><div id="suggestions" class="suggestions"></div><p class="disclaimer">Suggestions are advisory, not assessments or automated decisions.</p></div>
+  </div>
+  <div class="panel upload-panel"><div class="panel-head"><div><h3>Session files</h3><p>Upload authorized recordings or supporting documents for local storage.</p></div></div><form id="upload-form"><input id="upload-file" type="file" accept=".mp4,.mov,.avi,.wav,.mp3,.m4a,.pdf,.csv" required><button class="btn btn-secondary">Upload file</button></form><p class="disclaimer">Upload stores the file only. It does not automatically run video/audio analysis in this starter version.</p></div>
+ </section>
+</main>
+
+<div class="modal hidden" id="session-modal"><form class="modal-card" id="session-form"><button type="button" class="modal-close" data-close>×</button><span class="eyebrow">NEW CLASSROOM SESSION</span><h2>Create a session</h2><label>Session title<input name="title" required placeholder="e.g. Mathematics — Algebra"></label><label>Class / group<input name="class_name" placeholder="e.g. Class 10-A"></label><label>Notes<textarea name="notes" rows="3" placeholder="Optional session notes"></textarea></label><button class="btn btn-primary full-btn">Create session</button></form></div>
+<div class="modal hidden" id="student-modal"><form class="modal-card" id="student-form"><button type="button" class="modal-close" data-close>×</button><span class="eyebrow">ROSTER MANAGEMENT</span><h2>Add a student</h2><label>Student ID<input name="student_code" required placeholder="e.g. STU-005"></label><label>Full name<input name="full_name" required placeholder="Student full name"></label><label>Class / group<input name="group_name" placeholder="e.g. Class 10-A"></label><button class="btn btn-primary full-btn">Add student</button></form></div>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body></html>
