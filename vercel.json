@@ -1,14 +1,14 @@
 {
   "builds": [
     {
-      "src": "run.py",
+      "src": "classsense_fullstack/run.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "run.py"
+      "dest": "classsense_fullstack/run.py"
     }
   ]
 }
