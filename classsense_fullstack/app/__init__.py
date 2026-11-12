@@ -1,4 +1,5 @@
 import os
+import tempfile
 from pathlib import Path
 from flask import Flask, jsonify, render_template
 from flask_cors import CORS
@@ -6,14 +7,19 @@ from .extensions import db
 from .routes import api
 
 def create_app():
-    app = Flask(__name__, instance_relative_config=True)
+    is_vercel = os.getenv("VERCEL") == "1"
+    instance_path = None
+    if is_vercel:
+        instance_path = str(Path(tempfile.gettempdir()) / "classsense-instance")
+    app = Flask(__name__, instance_path=instance_path, instance_relative_config=True)
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-only-change-me")
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///classsense.db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["MAX_CONTENT_LENGTH"] = int(os.getenv("MAX_CONTENT_LENGTH_MB", "250")) * 1024 * 1024
     upload_dir = Path(os.getenv("UPLOAD_FOLDER", "uploads"))
     if not upload_dir.is_absolute():
-        upload_dir = Path(app.root_path).parent / upload_dir
+        upload_base = Path(app.instance_path) if is_vercel else Path(app.root_path).parent
+        upload_dir = upload_base / upload_dir
     upload_dir.mkdir(parents=True, exist_ok=True)
     app.config["UPLOAD_FOLDER"] = str(upload_dir)
 

@@ -31,6 +31,10 @@ Open http://127.0.0.1:5000. A small sample roster is seeded on first run. Change
 - SQLite and uploaded files on an ephemeral host filesystem can be lost on redeploy/restart. Use a persistent disk or managed PostgreSQL/object storage for production.
 - For production, add authentication, role-based access, CSRF protection, rate limiting, secure cookies, backups, audit logs and HTTPS before exposing student information.
 
+## Vercel deployment
+- The app uses Vercel's temporary directory for its default SQLite database and uploads, avoiding writes to the read-only deployment bundle.
+- Vercel temporary storage is not durable or shared across function instances. Configure durable external database and file storage before using the app for persistent data.
+
 ## Important scope / accuracy notes
 This is a functioning application foundation, not a completed automated biometric attendance or emotion-recognition system.
 - Attendance is manually confirmed by an educator. The app does not identify students from faces.
